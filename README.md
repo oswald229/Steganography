@@ -11,9 +11,10 @@ _Project built using Python 3 ._
 ##### Windows
 `cd env/Scripts && activate`
 
+_Go back to project directory._
 ##### Install needed packages
 
-`pip intall -r requirements.txt`
+`pip install -r requirements.txt`
 #### Run the program
 `python main.py`
 
