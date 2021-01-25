@@ -52,8 +52,10 @@ class Interface(Frame):
         self.result_path = StringVar()
         self.result_path.set("Result path...")
 
-        self.pictures = []
-        self.current = -1
+        self.pictures = [
+            # {'picture':PhotoImage, 'tag':'Receiver|Secret|Message}, 'path': String
+        ]
+        self.current = None
         
 
         self.button_width = 12
@@ -157,6 +159,7 @@ class Interface(Frame):
         self.buttonRightArrow = Button(decodingFrame, text='>', command=self.next_picture)
         self.buttonRightArrow.place(relx=0.6, rely=0.7, anchor=CENTER)
 
+
         # Right side of the window
 
         rightFrame = Frame(window, width=window.winfo_width() / 2,
@@ -203,27 +206,17 @@ class Interface(Frame):
 
             
             if len(self.pictures) == 0:
-                self.pictures.append(self.receiver.subsample(3,3))
+                self.pictures.append({'picture': self.receiver.subsample(3,3), 'tag': "Receiver", 'path':self.receiver_path.get()})
             else:
-                self.pictures[0] = self.receiver.subsample(3,3)
-
-            self.display_picture(0)
-            # self.displayerCanvas.create_image(self.displayerCanvas.winfo_width(
-            # )/2, self.displayerCanvas.winfo_height()/2, anchor=CENTER, image=self.pictures[0])
+                self.pictures[0] = {'picture': self.receiver.subsample(3,3), 'tag': "Receiver", 'path':self.receiver_path.get()}
+            
+            self.display_picture(0, tag='Receiver')
+       
 
 
             return self.receiver
 
-    def display_picture(self, picture_idx):
-        
-        self.current = int(picture_idx)
-        
-        self.displayerCanvas.create_image(self.displayerCanvas.winfo_width(
-            )/2, self.displayerCanvas.winfo_height()/2, anchor=CENTER, image=self.pictures[self.current])
-
-        
-
-        
+    
 
     def open_secret(self):
         """
@@ -245,9 +238,11 @@ class Interface(Frame):
             self.entrySecretPath.insert(0, self.secret_path.get())
 
             if len(self.pictures) == 1:
-                self.pictures.append(self.secret.subsample(3,3))
+                self.pictures.append({'picture': self.secret.subsample(3,3), 'tag': "Secret",'path':self.secret_path.get()})
             else:
-                self.pictures[1] = self.secret.subsample(3,3)
+                self.pictures[1] = {'picture': self.secret.subsample(3,3), 'tag': "Secret", 'path':self.secret_path.get()}                
+
+            
 
             return self.secret
 
@@ -324,6 +319,9 @@ class Interface(Frame):
                     result = stegano.encode()
 
                     imageio.imwrite(output, result)
+                    
+                    self.pictures.append({'picture':PhotoImage(file=output).subsample(3,3), 'tag':'Encode', 'path':output})
+                    self.display_picture(len(self.pictures)-1)
 
                     return result
 
@@ -343,14 +341,51 @@ class Interface(Frame):
 
         imageio.imwrite(output, result)
 
+    def display_picture(self, picture_idx, tag=''):
+        
+                
+        if self.current != None : self.displayerCanvas.delete(self.current['tag'])
+        
+        self.current = self.pictures[int(picture_idx)]
+
+        if tag=='':
+            tag = self.current['tag']
+
+        self.displayerCanvas.create_image(self.displayerCanvas.winfo_width(
+            )/2, self.displayerCanvas.winfo_height()/2, anchor=CENTER, image=self.current['picture'], tag=tag)
+    
     def next_picture(self):
-
-        print('****Next*****')
         
+        if self.current!=None:
+            try:
+                idx = self.pictures.index(self.current)+1
+                if(idx<len(self.pictures)):
+                    self.display_picture(idx)
 
-        pass
+
+            except IndexError:
+                
+                pass
+
     def previous_picture(self):
-        print('****Previous*****')
         
+        if self.current!=None:
+            try:
+                idx = self.pictures.index(self.current)-1
+                if(idx>=0):
+                    self.display_picture(idx)
 
-        pass
+
+            except IndexError:
+                
+                pass
+
+    def get_from_path(self, path):
+        path = str(path)
+        
+        for pic in self.pictures:
+            
+            if path in pic['path']:
+                return pic
+
+        return None
