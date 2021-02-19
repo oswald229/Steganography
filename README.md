@@ -9,11 +9,11 @@ _Project built using Python 3 ._
 ##### Linux & macOs
 `source env/bin/activate`
 ##### Windows
-`cd env/Scripts && activate`
+`env/Scripts/activate`
 
 ##### Install needed packages
 
-`pip intall -r requirements.txt`
+`pip install -r requirements.txt`
 #### Run the program
 `python main.py`
 
