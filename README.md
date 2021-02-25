@@ -9,9 +9,8 @@ _Project built using Python 3 ._
 ##### Linux & macOs
 `source env/bin/activate`
 ##### Windows
-`cd env/Scripts && activate`
+`env/Scripts/activate`
 
-_Go back to project directory._
 ##### Install needed packages
 
 `pip install -r requirements.txt`
